@@ -1,0 +1,37 @@
+---
+# vim: set ft=ansible:
+# main tasks file for patch testing
+- name: ensure lldpad is available
+  yum:
+    name: lldpad
+    state: installed
+
+- name: ensure lldpad is running
+  service:
+    name: lldpad
+    state: running
+
+- name: enable LLDP transmission on all interfaces
+  command: "lldptool set-lldp -i {{ item }} adminStatus=rxtx"
+  with_items: "{{ ansible_interfaces }}"
+  when: not item|search ('^(bond|lo|usb)[0-9]?')
+
+- name: create local facts dir
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+    mode: 0755
+    recurse: yes
+
+- copy:
+    src: lldp.fact
+    dest: /etc/ansible/facts.d
+    mode: 0755
+
+- setup:
+    filter: ansible_local
+# from here on we would write our testing tasks
+# almost certainly in a with_items include loop
+# for now we just debug
+- debug:
+    var: ansible_local
