@@ -31,9 +31,9 @@ def parse_cmdline(argv):
     usg = "%prog [-h] [-o FORMAT] [--host HOST] CSVFILE"
     preamble = "Parses CSV for relevant patching info, returns JSON or YAML"
     parser = OptionParser(usage=usg, description=preamble)
-    parser.add_option("-o", "--output", type="choice", choices=['yaml', 'json'], default='yaml',
-                      help="Select output format (yaml or json, default yaml)")
+    parser.add_option("-y", "--yaml", action="store_true", default=False, help="output YAML (for ansible vars files) rather than JSON (ansible dynamic inventory)")
     parser.add_option("-H", "--host", help="select hostname to extract from input file, must match exactly, not case sensitive though")
+    parser.add_option("-l", "--list", action="store_true", default=False, help="list all groups, hosts and vars")
 
     opts, args = parser.parse_args(argv)
 
@@ -49,7 +49,7 @@ def parse_cmdline(argv):
 
     return opts, args[0]
 
-def parse_patch_schedule(inputdata, hostlimit=None):
+def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
     """
     Process a CSV-formatted patching schedule and convert it to a 
     """
@@ -72,17 +72,20 @@ def parse_patch_schedule(inputdata, hostlimit=None):
                       }
 
             if host not in output:
-                output[host] = {nic: netinfo }
+                output[host] = { 'patching' : {nic: netinfo }}
             else:
-                output[host][nic] = netinfo
+                output[host]['patching'][nic] = netinfo
         # if there aren't enough entries to split the line, move on
         # this should skip blank lines and 
         except IndexError:
             continue
+    if inventory_format:
+        return {'_meta': {
+                    'hostvars': output 
+                    }
+               }
 
     return output
-
-
 
 
 def main():
@@ -90,10 +93,10 @@ def main():
 
     opts, inputfile = parse_cmdline(sys.argv[1:])
 
-    output = parse_patch_schedule(open(inputfile), opts.host)
+    output = parse_patch_schedule(open(inputfile), opts.host, inventory_format=opts.list)
 
 
-    if opts.output == 'yaml':
+    if opts.yaml:
         print yaml.dump(output, default_flow_style=False)
     else:
         print json.dumps(output, indent=2)
