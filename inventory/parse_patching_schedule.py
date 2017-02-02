@@ -5,6 +5,7 @@
 # standard library modules
 import sys
 import os
+from glob import glob
 import csv
 from optparse import OptionParser
 try:
@@ -37,17 +38,21 @@ def parse_cmdline(argv):
 
     opts, args = parser.parse_args(argv)
 
-    if len(args) != 1:
-        print "Error: please provide one CSV-format input file to parse"
-        parser.print_help()
-        sys.exit(1)
+#     if len(args) != 1:
+#         print "Error: please provide one CSV-format input file to parse"
+#         parser.print_help()
+#         sys.exit(1)
+# 
+#     if not os.path.exists(args[0]):
+#         print "Error: file %s does not appear to exist" % args[0]
+#         parser.print_help()
+#         sys.exit(2)
 
-    if not os.path.exists(args[0]):
-        print "Error: file %s does not appear to exist" % args[0]
-        parser.print_help()
-        sys.exit(2)
+    if len(args) == 0:
+        args = glob('%s/*.csv' % os.path.dirname(os.path.abspath(__file__)))
 
-    return opts, args[0]
+
+    return opts, args
 
 def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
     """
@@ -91,26 +96,21 @@ def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
 def main():
     """main script funcionality"""
 
-    opts, inputfile = parse_cmdline(sys.argv[1:])
+    opts, filelist = parse_cmdline(sys.argv[1:])
 
-    output = parse_patch_schedule(open(inputfile), opts.host, inventory_format=opts.list)
+    output = {}
+
+    for inputfile in filelist:
+        try:
+            output.update(parse_patch_schedule(open(inputfile), opts.host, inventory_format=opts.list))
+        except IOError, OSError:
+            continue
 
 
     if opts.yaml:
         print yaml.dump(output, default_flow_style=False)
     else:
         print json.dumps(output, indent=2)
-
-
-
-
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     main()
