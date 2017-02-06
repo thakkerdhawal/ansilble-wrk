@@ -65,14 +65,15 @@ def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
         if line[0] == 'Device Name':
             continue
         try:
+            # split up the lines into fields
             sw, pi, hn, ni, ct, vl, bo = line
             host = hn.lower()
             if hostlimit is not None and host != hostlimit:
                 continue
             nic = ni.lower()
 
-            netinfo = { 'switch_name': sw,
-                        'port_id': pi.replace('ET','Ethernet'),
+            netinfo = { 'switch_name': sw.lower(),
+                        'port_id': pi.replace('ET','Ethernet').lower(),
                         'bond' : bo.lower()
                       }
 
@@ -84,6 +85,8 @@ def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
         # this should skip blank lines and 
         except IndexError:
             continue
+        except:
+            raise
     if inventory_format:
         return {'_meta': {
                     'hostvars': output 
