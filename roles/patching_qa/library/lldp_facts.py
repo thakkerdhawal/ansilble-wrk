@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-# vim: set ft=python :
+# a custom ansible module to use LLDP to discover network information
 import os
 import re
 import subprocess
+
 """
 
 * This is normal LLDPTOOL output (lldptool -t -n -i INTERFACE)
@@ -47,13 +48,13 @@ LLDP_MAPS = {
     'Chassis ID TLV': 'port_mac',
     }
 
-try:
-    try:
-        import json
-    except ImportError:
-        import simplejson as json
-except ImportError:
-    print json.dumps({})
+# try:
+#     try:
+#         import json
+#     except ImportError:
+#         import simplejson as json
+# except ImportError:
+#     print json.dumps({})
 
 def get_interfaces(devpath="/sys/class/net", exclude="^(bond|lo|usb)[0-9]?"):
     """
@@ -117,10 +118,19 @@ def main():
     """
     Main script entry point
     """
+    module = AnsibleModule(
+        argument_spec = dict(
+            devpath = dict(default="/sys/class/net"),
+            ignore  = dict(default="^(bond|lo|usb)([0-9]+)?"),
+            ))
+
+    devpath = module.params['devpath']
+    ignore = module.params['ignore']
+
     # dict to hold structured output
     results = {}
     # iterate over discovered interfaces
-    for dev in get_interfaces():
+    for dev in get_interfaces(devpath, ignore):
         # ensure LLDP transmission is enabled
         # ansible will do this anyway
         # enable_lldp(dev)
@@ -128,8 +138,13 @@ def main():
         if nicinfo is not None:
             results[dev] = nicinfo
 
-    print json.dumps(results, indent=2)
+    module.exit_json(changed=True, 
+                     ansible_facts = {
+                         'ansible_lldp': results
+                         })
 
+from ansible.module_utils.basic import AnsibleModule
 if __name__ == "__main__":
     main()
+
 
