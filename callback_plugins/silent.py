@@ -2,17 +2,7 @@
 # a simple ansible plugin to summarise only the info we require 
 # only from the modules we care about
 """
-This is a custom callback module that summarises the network patching QA process
-
-For each NIC item fro which we have a patching config, generate a report in JSON format.
-
-also, pretty print to stdout.
-
-TODO?
-post output to BAM endpoint as JSON?
-
-
-
+This is a custom callback module that stifles all output to stdout to test other callbacks
 """
 from __future__ import print_function, division, absolute_import
 
@@ -44,7 +34,6 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_task_start(self, task, is_conditional):
         pass
 
-# for loop management, react to individual items in a list
     def v2_runner_item_on_ok(self, result):
         pass
 
