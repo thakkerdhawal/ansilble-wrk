@@ -1,0 +1,5 @@
+---
+# vim: set ft=ansible:
+interface_checks:
+  - port_id
+  - switch_name

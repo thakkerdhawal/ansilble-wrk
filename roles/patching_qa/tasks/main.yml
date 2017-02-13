@@ -19,6 +19,7 @@
   yum:
     name: lldpad
     state: installed
+  tags: simple
 
 - name: ensure lldpad is running
   service:
@@ -27,25 +28,34 @@
 
 - name: enable LLDP transmission on all interfaces
   command: "lldptool set-lldp -i {{ item }} adminStatus=rxtx"
-  with_items: "{{ ansible_interfaces }}"
+  with_items: "{{ patching.keys() }}"
   when: not item|search ('^(bond|lo|usb)[0-9]?')
+  ignore_errors: yes
 
 - name: wait for lldpad to wake up
   pause:
     seconds: 10
+  tags:
+    - delay
 
 - name: gather LLDP information
   lldp_facts:
+  tags:
+    - assert
 
 - name: check patching schedule for {{ inventory_hostname }} 
   assert_pico:
     that: "patching['{{ item.0 }}']['{{ item.1 }}'].split('.')|first == ansible_lldp['{{ item.0 }}']['{{ item.1 }}'].split('.')|first"
-    fail_msg: "{{ item.0 }}.{{ item.1 }}: FAIL [ {{ patching[item.0][item.1] }} !=  {{ ansible_lldp[item.0][item.1] }}]"
-    pass_msg: "{{ item.0 }}.{{ item.1 }}: PASS"
+    fail_msg: "{{ patching[item.0][item.1] }} !=  {{ ansible_lldp[item.0][item.1] }}"
+    pass_msg: "{{ patching[item.0][item.1] }} ==  {{ ansible_lldp[item.0][item.1] }}"
   with_nested: 
     - "{{ patching.keys() }}"
-    - [ "switch_name", "port_id" ]
+    - "{{ interface_checks }}"
   ignore_errors: yes
   when: "item.0 in ansible_lldp.keys()"
+  register: patch_checks
   tags:
     - assert
+
+# - debug:
+#     var: patch_checks
