@@ -32,6 +32,7 @@ How to run this
   * put your patching schedule into the inventory directory in csv format
   * run the playbook a bit like this:
 
+
     [user@ansiblehost syseng-ansible-qa]$ ansible-playbook -l rate-bas-p002 -vvk lldp.yml
     Using /home/user/syseng-ansible-qa/ansible.cfg as config file
     SSH password: ********
