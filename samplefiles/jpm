@@ -1,0 +1,145 @@
+[ficc_cem]
+cem-dc3-p001 ansible_host=192.168.12.100
+cem-dc3-p002 ansible_host=192.168.12.101
+cem-dc3-p003 ansible_host=192.168.12.98
+cem-dc3-p004 ansible_host=192.168.12.99
+cem-ny4-p001 ansible_host=169.122.154.4
+cem-ny4-p002 ansible_host=169.122.154.5
+cem-ny4-p003 ansible_host=169.122.154.6
+cem-ny4-p004 ansible_host=169.122.154.7
+cem-ny4-p005 ansible_host=169.122.154.8
+cem-ny4-p006 ansible_host=169.122.154.9
+cem-ny4-p007 ansible_host=169.122.154.10
+cem-ny4-p008 ansible_host=169.122.154.11
+cem-ny4-p009 ansible_host=169.122.154.12
+cem-ny4-p010 ansible_host=169.122.154.13
+cem-ny4-p011 ansible_host=169.122.154.14
+cem-ny4-p012 ansible_host=169.122.154.15
+cem-ny4-p013 ansible_host=169.122.154.16
+cem-ny4-p014 ansible_host=169.122.154.17
+cem-ny4-p015 ansible_host=169.122.154.18
+cem-ny4-p016 ansible_host=169.122.154.19
+cem-ny4-p017 ansible_host=169.122.154.20
+cem-ny4-p018 ansible_host=169.122.154.21
+cem-ny4-p019 ansible_host=169.122.154.22
+cem-ny4-p020 ansible_host=169.122.154.23
+cem-ny4-p021 ansible_host=169.122.154.24
+cem-ny4-p022 ansible_host=169.122.154.25
+cem-ny4-p023 ansible_host=169.122.154.26
+cem-ny4-p024 ansible_host=169.122.154.27
+cem-ny4-p025 ansible_host=169.122.154.28
+cem-ny4-p026 ansible_host=169.122.154.29
+cem-ny4-p027 ansible_host=169.122.154.30
+cem-ny4-p028 ansible_host=169.122.154.31
+cem-ny4-p029 ansible_host=169.122.154.32
+cem-ny4-p030 ansible_host=169.122.154.33
+
+[ficc_macr]
+macr-ny4-p001 ansible_host=169.122.154.34
+macr-ny4-p002 ansible_host=169.122.154.35
+macr-ny4-p003 ansible_host=169.122.154.36
+macr-ny4-p004 ansible_host=169.122.154.37
+macr-ny4-p005 ansible_host=169.122.154.38
+
+[ficc:children]
+ficc_cem
+ficc_macr
+
+[fo]
+fo-dc3-p001 ansible_host=172.20.81.30
+fo-dc3-p002 ansible_host=172.20.81.54
+fo-dc3-p003 ansible_host=172.20.81.19
+fo-dc3-p004 ansible_host=172.20.81.58
+fo-dc3-p005 ansible_host=172.20.81.42
+fo-dc3-p006 ansible_host=172.20.81.44
+fo-dc3-p007 ansible_host=172.20.81.50
+fo-dc3-p008 ansible_host=172.20.81.24
+fo-dc3-p009 ansible_host=172.20.81.21
+fo-dc3-p010 ansible_host=172.20.81.23
+
+[ett]
+ett-dc3-p001 ansible_host=172.20.81.15
+ett-dc3-p002 ansible_host=172.20.81.26
+ett-dc3-p003 ansible_host=172.20.81.46
+ett-dc3-p004 ansible_host=172.20.81.52
+
+[rate_bas]
+rate-bas-p001 ansible_host=170.76.66.4
+rate-bas-p002 ansible_host=170.76.66.5
+rate-bas-p003 ansible_host=170.76.66.6
+rate-bas-p004 ansible_host=170.76.66.7
+rate-bas-p005 ansible_host=170.76.66.8
+rate-bas-p006 ansible_host=170.76.66.9
+rate-bas-p007 ansible_host=170.76.66.10
+rate-bas-p008 ansible_host=170.76.66.11
+
+[rate_ch4]
+rate-ch4-p001 ansible_host=172.20.65.21
+rate-ch4-p002 ansible_host=172.20.65.25
+rate-ch4-p003 ansible_host=172.20.65.23
+rate-ch4-p004 ansible_host=172.20.65.29
+rate-ch4-p005 ansible_host=172.20.65.27
+
+[rate_crt]
+rate-crt-p001 ansible_host=172.20.33.11
+rate-crt-p002 ansible_host=172.20.33.17
+rate-crt-p003 ansible_host=172.20.33.15
+rate-crt-p004 ansible_host=172.20.33.10
+rate-crt-p005 ansible_host=172.20.33.19
+rate-crt-p006 ansible_host=172.20.33.21
+rate-crt-p007 ansible_host=172.20.33.14
+rate-crt-p008 ansible_host=172.20.33.13
+
+[rate_dc3]
+rate-dc3-p001 ansible_host=172.20.81.38
+rate-dc3-p002 ansible_host=172.20.81.17
+rate-dc3-p003 ansible_host=172.20.81.28
+rate-dc3-p004 ansible_host=172.20.81.36
+rate-dc3-p005 ansible_host=172.20.81.40
+rate-dc3-p006 ansible_host=172.20.81.56
+rate-dc3-p007 ansible_host=172.20.81.48
+rate-dc3-p008 ansible_host=172.20.81.32
+rate-dc3-p009 ansible_host=172.20.81.34
+
+[rate_fr2]
+rate-fr2-p001 ansible_host=172.24.17.18
+rate-fr2-p002 ansible_host=172.24.17.16
+rate-fr2-p003 ansible_host=172.24.17.19
+rate-fr2-p004 ansible_host=172.24.17.24
+rate-fr2-p005 ansible_host=172.24.17.17
+rate-fr2-p006 ansible_host=172.24.17.15
+rate-fr2-p007 ansible_host=172.24.17.25
+rate-fr2-p008 ansible_host=172.24.17.23
+
+[rate_nj2]
+rate-nj2-p001 ansible_host=172.20.17.12
+rate-nj2-p002 ansible_host=172.20.17.10
+rate-nj2-p003 ansible_host=172.20.17.17
+rate-nj2-p004 ansible_host=172.20.17.14
+
+[rate_ny2]
+rate-ny2-p001 ansible_host=172.20.145.32
+rate-ny2-p002 ansible_host=172.20.145.27
+rate-ny2-p003 ansible_host=172.20.145.14
+rate-ny2-p004 ansible_host=172.20.145.33
+rate-ny2-p005 ansible_host=172.20.145.12
+rate-ny2-p006 ansible_host=172.20.145.29
+rate-ny2-p007 ansible_host=172.20.145.16
+rate-ny2-p008 ansible_host=172.20.145.18
+rate-ny2-p009 ansible_host=172.20.145.20
+rate-ny2-p010 ansible_host=172.20.145.30
+
+[rate_us:children]
+rate_ch4
+rate_crt
+rate_dc3
+rate_nj2
+rate_ny2
+
+[rate_emea:children]
+rate_bas
+rate_fr2
+
+[rate:children]
+rate_us
+rate_emea
