@@ -59,13 +59,12 @@ class ActionModule(ActionBase):
             test_result = cond.evaluate_conditional(templar=self._templar, all_vars=task_vars)
             if not test_result:
                 result['failed'] = True
-                result['evaluated_to'] = test_result
-                result['assertion'] = that
-
                 result['msg'] = fail_msg
 
                 return result
-
+        result['failed'] = False
+        result['state'] = "FAIL" if result['failed'] else "PASS"
+        result['evaluated_to'] = test_result
         result['changed'] = False
         result['msg'] = pass_msg
         return result
