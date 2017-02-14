@@ -10,19 +10,42 @@ To adjust any settings, please update the local ansible.cfg file.
 Current playbooks
 ---------------------------
 
-  * lldp.yml  - playbook to use LLDP (via lldpad) to gather info about switch connections and compare them with a patching schedule.
+  * `lldp.yml`  - playbook to use LLDP (via lldpad) to gather info about switch connections and compare them with a patching schedule.
 
 Current Roles
 -------------
 
-  * patching_qa - role to deploy and read output from lldpad on target hosts, comparing it to golden data
+  * `patching_qa` - role to deploy and read output from lldpad on target hosts, comparing it to golden data
 
 
 
 Current inventory scripts
 -------------------------
 
-  * parse_patching_schedule.py - dynamic inventory script that parses a CSV patch schedule
+  * `parse_patching_schedule.py` - dynamic inventory script that parses a CSV patch schedule
+
+The CSV input should fields in the following order:
+
+    switch name, port ID, hostname, interface, cabletype, VLAN ID, bond device
+    
+Blank (or other non-matching) lines before this are ignored
+
+This script, when run, will produce output similar to the following:
+
+    { '_meta': {
+        'hostvars': {
+            hostname: {
+                interface: {  
+                    'switch_name': foo,
+                    'port_id' : bar,
+                    'bond': baz,
+                    }
+                }
+            }
+        }
+    }
+
+All properties, hostnames and interface names are lowercased.
 
 How to run this
 ---------------
