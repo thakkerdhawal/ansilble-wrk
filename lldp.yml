@@ -2,7 +2,8 @@
 # ansible playbook to deploy and test custom facts
 # for LLDP output
 # vim: set ft=ansible :
-- name: test LLDP
+- name: QA Patching via LLDP
   hosts: all
+  gather_facts: yes
   roles:
     - patching_qa
