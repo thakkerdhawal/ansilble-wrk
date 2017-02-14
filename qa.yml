@@ -1,0 +1,7 @@
+---
+- name: qa_logical
+  hosts: all
+  gather_facts: true 
+  roles:
+      - qa_d42
+      - qa_gw
