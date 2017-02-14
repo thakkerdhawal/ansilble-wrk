@@ -23,7 +23,14 @@ from ansible.plugins.action import ActionBase
 
 
 class ActionModule(ActionBase):
-    ''' Fail with custom message '''
+    """
+    Customised assert with additional parameters
+    fail_msg: custom text when assertions fail
+    pass_msg:  custom text when they all pass
+    case_sensitive: yes
+    strip_domain: yes
+    """
+
 
     TRANSFERS_FILES = False
 
@@ -35,6 +42,7 @@ class ActionModule(ActionBase):
 
         if 'that' not in self._task.args:
             raise AnsibleError('conditional required in "that" string')
+
 
         msg = None
         if 'msg' in self._task.args:
@@ -54,15 +62,15 @@ class ActionModule(ActionBase):
         # by this point, and is not used again, so we don't care about mangling
         # that value now
         cond = Conditional(loader=self._loader)
+        result['failed'] = False
         for that in thats:
             cond.when = [that]
             test_result = cond.evaluate_conditional(templar=self._templar, all_vars=task_vars)
             if not test_result:
                 result['failed'] = True
                 result['msg'] = fail_msg
+                break
 
-                return result
-        result['failed'] = False
         result['state'] = "FAIL" if result['failed'] else "PASS"
         result['evaluated_to'] = test_result
         result['changed'] = False
