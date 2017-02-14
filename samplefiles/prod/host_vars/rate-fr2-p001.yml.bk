@@ -1,0 +1,10 @@
+---
+name: rate-fr2-p001
+oob: 170.76.68.36
+bond0_ip: 170.76.69.5
+bond1_ip: 170.76.69.37
+bond3_ip: 170.76.68.5
+fma_ip: 10.133.18.3
+fmb_ip: 10.133.18.35
+host_serial: J1155N1
+next_hop: 170.76.68.1
