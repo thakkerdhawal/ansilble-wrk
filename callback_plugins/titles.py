@@ -1,18 +1,7 @@
 #!/usr/bin/env python
-# a simple ansible plugin to summarise only the info we require 
-# only from the modules we care about
+# a simple ansible plugin to summarise only the info we require
 """
-This is a custom callback module that summarises the network patching QA process
-
-For each NIC item fro which we have a patching config, generate a report in JSON format.
-
-also, pretty print to stdout.
-
-TODO?
-post output to BAM endpoint as JSON?
-
-
-
+This is a custom callback module that displays only minimal info to stdout
 """
 from __future__ import print_function, division, absolute_import
 
@@ -49,7 +38,7 @@ class CallbackModule(CallbackBase):
 
     def v2_runner_item_on_failed(self, result):
         pass
-        
+
     def v2_runner_item_on_skipped(self, result):
         pass
 
@@ -61,16 +50,29 @@ class CallbackModule(CallbackBase):
 
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.task = task
-        print ("  - Starting Task %s" %(task.name))
+        if self.task.name.strip() == '':
+            name = self.task.action
+        else:
+            name = self.task.name
+        print ("  - Starting Task %s" % name )
 
     def v2_runner_on_ok(self, result, *args, **kwargs):
         print ("  * [SUCCESS] on host %s" %(result._host.get_name()))
 
     def v2_runner_on_failed(self, result, ignore_errors):
-        print ("  * [FAILED] on host %s" %(result._host.get_name()))
+        print ("  * [FAILED ] on host %s" %(result._host.get_name()))
 
     def v2_runner_on_skipped(self, result):
         print ("  * [SKIPPED] host %s" %(result._host.get_name()))
+
+    def v2_runner_item_on_ok(self, result):
+        print ("      + [SUCCESS] %s - %s" % (result._host.get_name(), '.'.join(result._result['item'])))
+
+    def v2_runner_item_on_failed(self, result):
+        print ("      + [FAILED ] %s - %s" % (result._host.get_name(), '.'.join(result._result['item'])))
+
+    def v2_runner_item_on_skipped(self, result):
+        print ("      + [SKIPPED] %s - %s" % (result._host.get_name(), '.'.join(result._result['item'])))
 
     def playbook_on_stats(self, stats):
         pass
