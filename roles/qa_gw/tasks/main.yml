@@ -1,0 +1,11 @@
+---
+- name: "Ping gateway for each interface"
+  vars: 
+    pingval: "{{ '%s_%s' | format(item.0, item.1) }}"
+  command: ping  -c 2 {{ hostvars[inventory_hostname][pingval] }}
+  ignore_errors: yes 
+  with_nested:
+      - "{{ check_interfaces }}"
+      - "{{ interface_attrs }}"
+  tags:
+    - ping  
