@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# a simple ansible plugin to summarise only the info we require 
-# only from the modules we care about
+# a simple ansible callback plugin to essentially shut ansible up
 """
 This is a custom callback module that stifles all output to stdout to test other callbacks
 """
