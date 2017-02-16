@@ -3,7 +3,7 @@
 # main tasks file for patch testing
 # typical output from CSV parsing
 #   "rate-bas-p002": {
-#    "patching": {
+#    "patch_schedule": {
 #      "p4p2": {
 #        "port_id": "Ethernet4",
 #        "switch_name": "BAS-FIC-0H1E-12S-C02",
@@ -28,7 +28,7 @@
 
 - name: enable LLDP transmission on all interfaces
   command: "lldptool set-lldp -i {{ item }} adminStatus=rxtx"
-  with_items: "{{ patching.keys() }}"
+  with_items: "{{ patch_schedule.keys() }}"
   when: not item|search ('^(bond|lo|usb)[0-9]?')
   ignore_errors: yes
 
@@ -45,11 +45,11 @@
 
 - name: check patching schedule for {{ inventory_hostname }} 
   assert_pico:
-    that: "patching['{{ item.0 }}']['{{ item.1 }}'].split('.')|first == ansible_lldp['{{ item.0 }}']['{{ item.1 }}'].split('.')|first"
-    fail_msg: "{{ patching[item.0][item.1] }} !=  {{ ansible_lldp[item.0][item.1] }}"
-    pass_msg: "{{ patching[item.0][item.1] }} ==  {{ ansible_lldp[item.0][item.1] }}"
+    that: "patch_schedule['{{ item.0 }}']['{{ item.1 }}'].split('.')|first == ansible_lldp['{{ item.0 }}']['{{ item.1 }}'].split('.')|first"
+    fail_msg: "{{ patch_schedule[item.0][item.1] }} !=  {{ ansible_lldp[item.0][item.1] }}"
+    pass_msg: "{{ patch_schedule[item.0][item.1] }} ==  {{ ansible_lldp[item.0][item.1] }}"
   with_nested: 
-    - "{{ patching.keys() }}"
+    - "{{ patch_schedule.keys() }}"
     - "{{ interface_checks }}"
   ignore_errors: yes
   when: "item.0 in ansible_lldp.keys()"
