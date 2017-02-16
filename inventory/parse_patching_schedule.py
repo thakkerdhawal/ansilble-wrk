@@ -1,12 +1,17 @@
 #!/usr/bin/env python
 # A python tool to process the server patching schedule
 # Requires CSV-formatted input
+"""
+This is an ansible inventory script, using CSV input files from
+a patching schedule to add 
+"""
 
 # standard library modules
 import sys
 import os
 from glob import glob
 import csv
+import re
 from optparse import OptionParser
 try:
     import json
@@ -17,20 +22,11 @@ except ImportError:
 # to export in ansible vars format
 import yaml
 
-FIELDNAMES = [
-    'switch',
-    'switch_port',
-    'hostname',
-    'interface',
-    'cable_type',
-    'vlan',
-    'bond'
-    ]
 
 def parse_cmdline(argv):
     """Process commandline options and arguments"""
     usg = "%prog [-h] [-o FORMAT] [--host HOST] CSVFILE"
-    preamble = "Parses CSV for relevant patching info, returns JSON or YAML"
+    preamble = "Parses CSV for relevant patching info, returns JSON (for dynamic inventory) or YAML (for static versions)"
     parser = OptionParser(usage=usg, description=preamble)
     parser.add_option("-y", "--yaml", action="store_true", default=False, help="output YAML (for ansible vars files) rather than JSON (ansible dynamic inventory)")
     parser.add_option("-H", "--host", help="select hostname to extract from input file, must match exactly, not case sensitive though")
@@ -38,63 +34,97 @@ def parse_cmdline(argv):
 
     opts, args = parser.parse_args(argv)
 
-#     if len(args) != 1:
-#         print "Error: please provide one CSV-format input file to parse"
-#         parser.print_help()
-#         sys.exit(1)
-# 
-#     if not os.path.exists(args[0]):
-#         print "Error: file %s does not appear to exist" % args[0]
-#         parser.print_help()
-#         sys.exit(2)
-
     if len(args) == 0:
         args = glob('%s/*.csv' % os.path.dirname(os.path.abspath(__file__)))
-
 
     return opts, args
 
 def parse_patch_schedule(inputdata, hostlimit=None, inventory_format=False):
     """
-    Process a CSV-formatted patching schedule and convert it to a 
+    Process a CSV-formatted patching schedule and convert it to a dictionary
+    like this:
+    hostname : {
+      patching : {
+        nic : {
+          switch_name: name,
+          port_id: port,
+          bond: bondingdev_name,
+          vlan: VLAN label,
+          }
+
     """
     output = {}
     reader = csv.reader(inputdata)
     for line in reader:
-        # skip the column header lines
-        if line[0] == 'Device Name':
+        if '-' not in line[0]:
             continue
         try:
             # split up the lines into fields
-            sw, pi, hn, ni, ct, vl, bo = line
-            host = hn.lower()
-            if hostlimit is not None and host != hostlimit:
+            # Excel has a peculariuty where it ends all exported lines with a comma, so
+            # the lines won't ever work properly
+            if len(line) == 8:
+                sw, pi, hn, ni, ct, vl, bo = line[:-1]
+            else:
+                sw, pi, hn, ni, ct, vl, bo = line
+            # JPM naming scheme, LOB-DC-
+            if len(hn.split('-')) != 3:
+                continue
+            else:
+                line_of_business, datacenter, hostid = hn.split('-')
+
+            hostname = hn.lower()
+            if hostlimit is not None and hostname != hostlimit:
                 continue
             nic = ni.lower()
 
             netinfo = { 'switch_name': sw.lower(),
                         'port_id': pi.replace('ET','Ethernet').lower(),
-                        'bond' : bo.lower()
+                        'bond' : bo.lower(),
+                        'vlan': vl,
                       }
+            hostinfo = { 'lob_code': line_of_business,
+                         'dc_name': datacenter,
+                         'env_name': 'production' if hostid.startswith('P') else 'development',
+                         'patch_schedule': {
+                             nic: netinfo,
+                             }
+                         }
 
-            if host not in output:
-                output[host] = { 'patching' : {nic: netinfo }}
+            if hostname not in output:
+                output[hostname] = hostinfo
             else:
-                output[host]['patching'][nic] = netinfo
+                output[hostname]['patch_schedule'][nic] = netinfo
+
         # if there aren't enough entries to split the line, move on
         # this should skip blank lines and 
         except IndexError:
             continue
+        except ValueError:
+            continue
         except:
             raise
-    if inventory_format:
-        return {'_meta': {
-                    'hostvars': output 
-                    }
-               }
+    if hostlimit is not None:
+        if hostlimit in output:
+            return output[hostlimit]
+        else:
+            return {}
 
     return output
 
+def csviter(filename, separator=',', fieldcount=7):
+    """
+    iterate over the lines in our CSV files, compressing empty fields that are not at the end of the line
+    (to handle the empty fields in the BAS patching schedule workbook)
+
+    Args:
+        filename(str): file, probably in 
+
+    """
+    try:
+        for line in open(filename):
+            yield re.sub(r'%s+(?!$)' % separator, r'%s' % separator, line)
+    except (IOError, OSError):
+        return
 
 def main():
     """main script funcionality"""
@@ -105,11 +135,20 @@ def main():
 
     for inputfile in filelist:
         try:
-            output.update(parse_patch_schedule(open(inputfile), opts.host, inventory_format=opts.list))
+            output.update(parse_patch_schedule(csviter(inputfile), opts.host, inventory_format=opts.list))
         except IOError, OSError:
             continue
 
+    # ansible calls the inventory with a --list option, we want to return all host info at once so it's cached
+    if opts.list:
+        output = {
+                    '_meta': {
+                        'hostvars': output 
+                        }
+                    }
 
+    # support yaml output too if necessary
+    # one large file for the time being, though.
     if opts.yaml:
         print yaml.dump(output, default_flow_style=False)
     else:
