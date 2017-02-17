@@ -1,10 +1,11 @@
 ---
 - name: "D42 api get call: {{host_serial}}"
   uri:
-    url: "https://d42.picotrading.com/api/1.0/devices/serial/{{host_serial}}/?include_cols=name,tags,notes,buildings,customer,service_level,serial_no&limit=1000"
+    #url: "https://d42.picotrading.com/api/1.0/devices/serial/{{host_serial}}/?include_cols=name,tags,notes,buildings,customer,service_level,serial_no&limit=1000"
+    url: "{{d42_url}}/{{host_serial}}/?include_cols=name,tags,notes,buildings,customer,service_level,serial_no&limit=1000"
     method: GET
-    user: "d42ro.sa"
-    password: "d42r0sa!"
+    user: "{{d42_user}}"
+    password: "{{d42_passwd}}"
     force_basic_auth: yes
     return_content: yes
     body_format: json
