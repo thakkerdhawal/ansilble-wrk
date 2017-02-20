@@ -24,6 +24,38 @@ import re
 from ansible.plugins.callback import CallbackBase
 from pprint import pprint
 
+def index_dictlist(alist, key):
+    """
+    converts a list of dict into a dict of lists, indexing on a chosen
+    dictionary key, or optionally a string expansion (to combine keys)
+
+    example:
+    index_dictlist( foo, key='name')
+    returns
+    { 'name1' : [ {foo1} , {foo2} , {foo3}, ... ] } for all items in list that have a 'name' key
+
+    Args:
+        alist: a list of dict
+        key: the key to use as an index, or a string expression
+        exp(str): string generation expression to apply to each dict in turn.
+
+    Returns:
+        dict
+
+    """
+    output = {}
+    for item in alist:
+        try:
+            idx = item[key]
+            if idx not in output:
+                output[idx] = []
+                output[idx].append(item)
+            else:
+                output[idx].append(item)
+        except KeyError:
+            continue
+    return output
+
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
@@ -99,7 +131,9 @@ class CallbackModule(CallbackBase):
     v2_runner_on_skipped = v2_runner_on_ok
     
     def playbook_on_stats(self, stats):
-        print (json.dumps(self.reportlines, indent=2))
+        results_per_host = index_dictlist(self.reportlines, key='host')
+        #print (json.dumps(self.reportlines, indent=2))
+        print (json.dumps(results_per_host, indent=2))
 
 
 
