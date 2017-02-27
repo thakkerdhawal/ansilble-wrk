@@ -8,6 +8,6 @@ d42_incl_colmn:
       - customer
       - service_level
       - serial_no
-d42_user: 'd42ro.sa'
-d42_passwd: 'd42r0sa!'
+d42_user: 'usernname'
+d42_passwd: 'password'
 
