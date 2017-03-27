@@ -1,0 +1,23 @@
+---
+# vim: set ft=ansible:
+# must be included in the following fashion (or the "package" variable must be otherwise defined)
+# 
+#  include: local_install.yml
+#  with_items: "{{ lldpad_packages }}"
+#  loop_control:
+#    loop_var: package
+
+- name: copy {{ package }} RPM locally
+  copy:
+    src: "{{ package }}"
+    dest: "/tmp/{{ package }}"
+
+- name: install {{ package }} as local RPM
+  yum:
+    name: "/tmp/{{ package }}"
+    state: installed
+
+- name: remove local copies of {{ package }}
+  file:
+    path: "/tmp/{{ package }}"
+    state: absent

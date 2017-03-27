@@ -43,8 +43,7 @@ def index_dictlist(alist, key):
             idx = item[key]
             if idx not in output:
                 output[idx] = []
-            else:
-                output[idx].append(item)
+            output[idx].append(item)
         except KeyError:
             continue
     return output

@@ -1,0 +1,30 @@
+---
+# defaults file for roles/package_qa
+
+# only get (and compare) the latest installed version of packages
+# avoids false errors regarding kernels
+package_qa_latest_only: no
+
+# restrict QA to these packages only (shell-style wildcards, no regex or other funny business)
+# This is compared against a list of NAME.ARCH from each target 
+package_qa_filter: []
+
+# do not compare versioning for these packages, overrides pkgfilter
+# These are also shell-style wildcards
+package_qa_exclude: []
+
+# YOU MUST PROVIDE ONE OF THESE
+# where to get our golden list of packages from
+# source should be a file path. Place this in ROLEDIR/files or PLAYBOOKDIR/files
+# or provide an absolute path to the list.
+# the list must be in NAME-VERSION-RELEASE.ARCH format. EPOCH is currently ignored if present
+# package_qa_source: null
+# Alternatively, provide the inventory_hostname of the 'golden' host and we'll get package info
+# from there
+# package_qa_master: null
+
+# whether to ignore packages that are missing on either side of the comparison
+package_qa_ignoremissing: yes
+
+# only show the differences, do not report on packages that are identical
+package_qa_diffonly: yes

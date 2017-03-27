@@ -1,0 +1,55 @@
+---
+- name: confirm required qa_gw role variables exist
+  assert:
+    that:
+        - next_hop is defined
+        - bond0_next_hop is defined
+        - bond1_next_hop is defined
+        - bond3_next_hop is defined
+        - fma_next_hop is defined
+        - fmb_next_hop is defined
+
+- name: "Set secondary interface for each bond"
+  vars:
+    actbond: "{{ '%s' | format(item) }}"
+    actintf: "{{ '%s_backup' | format(item) }}"
+  command: ifenslave -c {{ actbond }} {{ hostvars[inventory_hostname][actintf]  }}
+  with_items: 
+        - "{{ check_interfaces }}"
+  when: item|search ('^bond')
+  tags:
+    - ping
+
+- name: "Ping gateway using secondary interface"
+  vars: 
+    pingval: "{{ '%s_%s' | format(item.0, item.1) }}"
+  command: ping  -c 2 {{ hostvars[inventory_hostname][pingval] }}
+  ignore_errors: yes 
+  with_nested:
+      - "{{ check_interfaces }}"
+      - "{{ interface_attrs }}"
+  tags:
+    - ping  
+
+
+- name: "Set primary interface for each bond"
+  vars:
+    actbond: "{{ '%s' | format(item) }}"
+    actintf: "{{ '%s_primary' | format(item) }}"
+  command: ifenslave -c {{ actbond }} {{ hostvars[inventory_hostname][actintf]  }}
+  with_items: 
+        - "{{ check_interfaces }}"
+  when: item|search ('^bond')
+  tags:
+    - ping
+ 
+- name: "Ping gateway using primary interface"
+  vars: 
+    pingval: "{{ '%s_%s' | format(item.0, item.1) }}"
+  command: ping  -c 2 {{ hostvars[inventory_hostname][pingval] }}
+  ignore_errors: yes 
+  with_nested:
+      - "{{ check_interfaces }}"
+      - "{{ interface_attrs }}"
+  tags:
+    - ping  

@@ -1,0 +1,54 @@
+---
+# vim: set ft=ansible:
+# tasks file for roles/package_qa
+# package_qa is a wrapper around an action plugin
+# that compares RPM packages on a host with either
+# 1. a "golden" host (called 'master')
+# 2. a list of RPMs
+
+# tasks:
+# 1. get a list of RPM packages from the target host
+# 2. run the comparison using our custom action plugin
+# 
+- name: pre-flight checks
+  assert:
+    that: ( package_qa_source is defined)  or (package_qa_master is defined)
+    msg: "either package_qa_source or package_qa_master is required"
+
+- name: gather RPM lists from servers
+  rpmpackagelist:
+    latest: "{{ package_qa_latest_only }}"
+- block:
+  - name: QA Package Lists against host
+    packageqa:
+      master: "{{ package_qa_master }}"
+      ignore_missing: "{{ package_qa_ignoremissing }}"
+      exclude: "{{ package_qa_exclude }}"
+      filter: "{{ package_qa_filter }}"
+      diff_only: "{{ package_qa_diffonly }}"
+    ignore_errors: yes
+    register: pqa_m
+
+  - name: display results
+    debug:
+      var: pqa_m
+
+  when: package_qa_master is defined
+
+- block:
+  - name: QA Package Lists against source file
+    packageqa:
+      src: "{{ package_qa_source }}"
+      ignore_missing: "{{ package_qa_ignoremissing }}"
+      exclude: "{{ package_qa_exclude }}"
+      filter: "{{ package_qa_filter }}"
+      diff_only: "{{ package_qa_diffonly }}"
+    ignore_errors: yes
+    register: pqa_s
+
+  - name: show output
+    debug:
+      var: pqa_s
+
+  when: package_qa_source is defined
+

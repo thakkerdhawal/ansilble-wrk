@@ -1,0 +1,10 @@
+---
+check_interfaces:
+      - bond0
+      - bond1
+      - bond3
+      - fma
+      - fmb
+interface_attrs:
+      - next_hop
+

@@ -1,0 +1,34 @@
+---
+- name: "D42 api get call: {{host_serial}}"
+  uri:
+    #url: "https://d42.picotrading.com/api/1.0/devices/serial/{{host_serial}}/?include_cols=name,tags,notes,buildings,customer,service_level,serial_no&limit=1000"
+    url: "{{d42_url}}/{{host_serial}}/?include_cols=name,tags,notes,buildings,customer,service_level,serial_no&limit=1000"
+    method: GET
+    user: "{{d42_user}}"
+    password: "{{d42_passwd}}"
+    force_basic_auth: yes
+    return_content: yes
+    body_format: json
+  register: json_response
+  delegate_to: localhost
+  ignore_errors: yes 
+  
+- name: "check hostname matches with D42 device name: {{ansible_hostname}}"
+  assert:
+    that:
+      - json_response.json.name|lower == ansible_hostname
+    msg: "{{json_response.json.name|lower}} != {{ansible_hostname}},  Hostname on D42 does not match with hostname on host"
+  ignore_errors: yes 
+      
+- name: "check host serialno matches with D42 device name: {{ansible_product_serial}}" 
+  assert:
+    that:
+      - json_response.json.serial_no == ansible_product_serial 
+    msg: "{{json_response.json.serial_no|lower}} != {{ansible_product_serial}},  Serialno on D42 does not match with host serial "
+  ignore_errors: yes 
+    
+- name: "check OOB IP is in D42 notes: {{oob}} "
+  assert:
+    that: oob in json_response.json.notes
+    msg: "{{oob}} != {{json_response.json.notes}}, OOB is not in D42"
+  ignore_errors: yes 

@@ -1,0 +1,12 @@
+---
+d42_url: 'https://d42.picotrading.com/api/1.0/devices/serial/'
+d42_incl_colmn:
+      - name
+      - tags
+      - notes
+      - buildings
+      - customer
+      - service_level
+      - serial_no
+d42_user: 'd42ro.sa'
+d42_passwd: 'd42r0sa!'

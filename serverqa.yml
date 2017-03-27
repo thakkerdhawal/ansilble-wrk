@@ -1,0 +1,10 @@
+---
+# vim: set ft=ansible:
+- name: test server patching via LLDP
+  include: lldp.yml
+
+- name: compare serial numbers with Device422
+  include: d42.yml
+
+- name: test network connectivity to gateways
+  include: ping.yml

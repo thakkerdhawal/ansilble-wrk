@@ -1,0 +1,13 @@
+---
+# vim: set ft=ansible :
+- name: test packagelist fact gathering
+  hosts: demo
+  vars:
+    master: "{{ play_hosts|first }}"
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - role: package_qa
+      package_qa_master: "{{ master }}"
+

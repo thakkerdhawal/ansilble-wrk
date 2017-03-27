@@ -15,11 +15,26 @@
 #   "port_id": "Ethernet4",
 #   "port_mac": "44:4c:a8:d6:f9:05",
 #   "switch_name": "BAS-FIC-0H1E-12S-C02.picotrading.com"
+
+- include_vars: "{{ ansible_distribution|lower }}{{ ansible_distribution_major_version }}.yml"
+  ignore_errors: yes
+
 - name: ensure lldpad is available
   yum:
     name: lldpad
     state: installed
   tags: simple
+  register: lldpad_install
+  ignore_errors: yes
+
+- name: copy RPMs locally for installation
+  include: local_install.yml
+  with_items: "{{ lldpad_packages }}"
+  loop_control:
+    loop_var: package
+  when: 
+    - lldpad_install | failed
+    - lldpad_packages is defined
 
 - name: ensure lldpad is running
   service:

@@ -1,0 +1,29 @@
+---
+# vim: set ft=ansible:
+- name: hosts test
+  hosts: all
+  gather_facts: no
+  tasks:
+    - group_by:
+        key: "{{ env_name |lower }}"
+    - group_by:
+        key: "{{ lob_code | lower }}"
+    - group_by:
+        key: "{{ dc_name | lower }}"
+
+- name: play2
+  hosts: bas
+  gather_facts: no
+  tasks:
+    #    - debug:
+    #    var: hostvars[inventory_hostname]
+    - debug:
+        msg: "random_fact - {{ randomfact|default('nope')}}"
+    - debug:
+        msg: "environment: {{ env_name |default('undefined') }}"
+    - debug:
+        msg: "datacenter: {{ dc_name| default('undefined') }}"
+    - debug:
+        msg: "interfaces: {{ patch_schedule.keys()|default([]) }}"
+    - debug:
+        var: patch_schedule

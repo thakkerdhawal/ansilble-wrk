@@ -1,0 +1,6 @@
+---
+# vim: set ft=ansible:
+# variables only used for centos7 hosts
+lldpad_packages:
+  - libconfig-1.4.9-5.el7.x86_64.rpm
+  - lldpad-1.0.1-3.git036e314.el7.x86_64.rpm

@@ -46,6 +46,8 @@ LLDP_MAPS = {
     'System Name TLV': 'switch_name',
     'Port ID TLV': 'port_id',
     'Chassis ID TLV': 'port_mac',
+    'Port VLAN ID TLV': 'port_vlan_id',
+    'System Description TLV': 'switch_description'
     }
 
 # try:
